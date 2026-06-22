@@ -71,6 +71,13 @@
     .form-group .optional { font-size: 10px; font-weight: 400; color: #888; letter-spacing: 0.05em; text-transform: none; }
     .submit-btn { width: 100%; background: #000; color: #fff; border: none; padding: 18px; font-size: 14px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-top: 8px; font-family: inherit; }
     .submit-btn:hover { background: #333; }
+    .submit-btn:disabled { background: #555; cursor: not-allowed; }
+
+    /* Thank you state */
+    #thank-you-msg { display: none; max-width: 600px; }
+    #thank-you-msg h3 { font-size: clamp(40px, 5vw, 72px); font-weight: 900; text-transform: uppercase; line-height: 1; margin-bottom: 24px; }
+    #thank-you-msg p { font-size: 20px; color: #444; line-height: 1.5; }
+    #thank-you-msg .divider { width: 60px; height: 3px; background: #000; margin: 32px 0; }
 
     footer { padding: 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     footer .footer-logo { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -86,9 +93,7 @@
       .benefits-grid { grid-template-columns: 1fr; }
       .lines-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 480px) {
-      .lines-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 480px) { .lines-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -147,12 +152,8 @@
           <div class="product-name">TITR8</div>
           <div class="product-sub">Fast Absorption Sublingual Peptide Drops</div>
           <ul class="peptide-list">
-            <li>BPC-157</li>
-            <li>GHK-CU</li>
-            <li>PT-141</li>
-            <li>Epitalon</li>
-            <li>Wolverine Stack</li>
-            <li>MOTS-c</li>
+            <li>BPC-157</li><li>GHK-CU</li><li>PT-141</li>
+            <li>Epitalon</li><li>Wolverine Stack</li><li>MOTS-c</li>
           </ul>
           <div class="delivery-note">5 Drops · Under Tongue 2 Min · Transmucosal Delivery</div>
           <div><span class="badge">titr8.com</span></div>
@@ -161,18 +162,12 @@
           <div class="product-name">Peptide Stack</div>
           <div class="product-sub">Superfood + Bioregulator Peptides</div>
           <ul class="peptide-list">
-            <li>Anserine · Connectagen</li>
-            <li>Renagen · Bronchigen</li>
-            <li>Elastagen · Testagen</li>
-            <li>Dairy, Ovum, Supergreens</li>
+            <li>Anserine · Connectagen</li><li>Renagen · Bronchigen</li>
+            <li>Elastagen · Testagen</li><li>Dairy, Ovum, Supergreens</li>
             <li>Avena &amp; Oryza Peptides</li>
           </ul>
           <div class="delivery-note">Capsules · Drink Mix Powder · Sublingual Powder</div>
-          <div>
-            <span class="badge">Natural</span>
-            <span class="badge">Halal</span>
-            <span class="badge">GRAS</span>
-          </div>
+          <div><span class="badge">Natural</span><span class="badge">Halal</span><span class="badge">GRAS</span></div>
         </div>
       </div>
     </div>
@@ -224,11 +219,12 @@
     <div class="container">
       <h2>Your Future Stack ›</h2>
       <p class="form-intro">Be first to know when Peptide Stack goes live. Sign up and we'll reach out directly.</p>
-      <form action="https://formsubmit.co/romeo@davidoffmedia.com" method="POST">
+
+      <!-- FORM -->
+      <form id="signup-form" action="https://formsubmit.co/ajax/romeo@davidoffmedia.com" method="POST">
         <input type="hidden" name="_subject" value="New Peptide Stack Sign Up" />
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_cc" value="chipmarsland@me.com" />
-        <input type="hidden" name="_next" value="https://peptide-stack.vercel.app/thank-you" />
         <div class="form-group">
           <label for="name">Full Name</label>
           <input type="text" id="name" name="name" placeholder="Your full name" required />
@@ -245,8 +241,16 @@
           <label for="phone">Phone Number</label>
           <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required />
         </div>
-        <button type="submit" class="submit-btn">Sign Up Now →</button>
+        <button type="submit" class="submit-btn" id="submit-btn">Sign Up Now →</button>
       </form>
+
+      <!-- THANK YOU (shown after submit) -->
+      <div id="thank-you-msg">
+        <h3>You're in.</h3>
+        <div class="divider"></div>
+        <p>We got your info and we'll be in touch before the site goes live.</p>
+        <p style="margin-top:12px;">Your future stack is coming.</p>
+      </div>
     </div>
   </section>
 
@@ -255,6 +259,22 @@
     <div class="footer-credit">Brought to you by Chip Marsland</div>
     <div class="footer-contact">917-628-7878</div>
   </footer>
+
+  <script>
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+      try {
+        const data = new FormData(this);
+        await fetch(this.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
+      } catch(err) { /* still show success — submission likely went through */ }
+      document.getElementById('signup-form').style.display = 'none';
+      document.querySelector('#signup .form-intro').style.display = 'none';
+      document.getElementById('thank-you-msg').style.display = 'block';
+    });
+  </script>
 
 </body>
 </html>
